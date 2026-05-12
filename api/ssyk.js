@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         "X-Title": "SSYK App"
       },
       body: JSON.stringify({
-        model: "google/gemma-7b-it:free",
+        model: "openrouter/auto",
         temperature: 0.2,
         messages: [
           {
