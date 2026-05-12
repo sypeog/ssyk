@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         "X-Title": "SSYK App"
       },
       body: JSON.stringify({
-        model: "nousresearch/nous-hermes-2-mixtral-8x7b-dpo:free",
+        model: "ring/2.6-1t:free",
         temperature: 0.2,
         messages: [
           {
