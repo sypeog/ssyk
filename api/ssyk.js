@@ -6,7 +6,7 @@ export default async function handler(req, res) {
       ? JSON.parse(req.body)
       : req.body;
 
-    // ✅ Om man öppnar API direkt
+    // ✅ Om API öppnas direkt
     if (!body || !body.title || !body.desc) {
       return res.status(200).json({
         message: "API is working. Send POST request with title and desc."
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
     const { title, desc } = body;
 
-    // ✅ OpenRouter call (GRATIS AI)
+    // ✅ Anropa OpenRouter (gratis AI)
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -60,7 +60,7 @@ Returnera ENDAST JSON i detta format:
     const data = await response.json();
     console.log("OpenRouter response:", data);
 
-    // ✅ Om AI svarar med fel
+    // ✅ Hantera API-fel
     if (!data.choices) {
       return res.status(500).json({
         error: "AI svarade med fel",
@@ -70,11 +70,18 @@ Returnera ENDAST JSON i detta format:
 
     const text = data.choices[0].message.content;
 
-    // ✅ Försök tolka JSON
+    // ✅ EXTRAHERA JSON (detta fixar ditt problem)
     let parsed;
 
     try {
-      parsed = JSON.parse(text);
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+
+      if (jsonMatch) {
+        parsed = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error("Ingen JSON hittades");
+      }
+
     } catch (e) {
       console.error("JSON parse error:", text);
 
@@ -82,7 +89,7 @@ Returnera ENDAST JSON i detta format:
         results: [
           {
             ssyk: "0000",
-            title: "Kunde inte tolka AI-svar",
+            title: "AI svarade inte korrekt",
             confidence: 0,
             p10: 0
           }
