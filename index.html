@@ -34,7 +34,7 @@ async function analysera() {
   const resultDiv = document.getElementById("result");
   resultDiv.innerHTML = "Analyserar...";
 
-  const res = await fetch("https://DIN-BACKEND-URL/api/ssyk", {
+  const res = await fetch("https://ssyk-two.vercel.app/api/ssyk", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
