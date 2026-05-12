@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         "X-Title": "SSYK App"
       },
       body: JSON.stringify({
-        model: "openai/gpt-3.5-turbo",
+        model: "mistralai/mistral-7b-instruct:free",
         temperature: 0.2,
         messages: [
           {
