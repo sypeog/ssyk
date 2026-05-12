@@ -25,7 +25,7 @@ Matcha denna roll till SSYK.
 Titel: ${title}
 Beskrivning: ${desc}
 
-Returnera JSON:
+Returnera ENDAST JSON:
 {
   "results": [
     {
@@ -45,11 +45,29 @@ Returnera JSON:
     const data = await response.json();
     const text = data.choices[0].message.content;
 
-    res.status(200).json(JSON.parse(text));
+    let parsed;
+
+    try {
+      parsed = JSON.parse(text);
+    } catch (e) {
+      console.log("Fel JSON från AI:", text);
+
+      parsed = {
+        results: [
+          {
+            ssyk: "0000",
+            title: "Kunde inte tolka svar",
+            confidence: 0,
+            p10: 0
+          }
+        ]
+      };
+    }
+
+    res.status(200).json(parsed);
 
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "AI error" });
   }
 }
-``
