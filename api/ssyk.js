@@ -6,7 +6,7 @@ export default async function handler(req, res) {
       ? JSON.parse(req.body)
       : req.body;
 
-    // ✅ Hantera om man öppnar API utan data
+    // ✅ Om man öppnar API direkt
     if (!body || !body.title || !body.desc) {
       return res.status(200).json({
         message: "API is working. Send POST request with title and desc."
@@ -15,16 +15,15 @@ export default async function handler(req, res) {
 
     const { title, desc } = body;
 
-    // ✅ Anropa OpenAI
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    // ✅ Anropa OpenRouter (GRATIS AI)
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        temperature: 0.2,
+        model: "mistralai/mistral-7b-instruct",
         messages: [
           {
             role: "system",
@@ -55,14 +54,13 @@ Returnera ENDAST JSON i detta format:
       })
     });
 
-    // ✅ Läs OpenAI svar
     const data = await response.json();
-    console.log("OpenAI response:", data);
+    console.log("OpenRouter response:", data);
 
-    // ✅ Om OpenAI returnerar error
+    // ✅ Hantera error från AI
     if (!data.choices) {
       return res.status(500).json({
-        error: "OpenAI svarade med fel",
+        error: "AI svarade med fel",
         details: data
       });
     }
@@ -100,3 +98,4 @@ Returnera ENDAST JSON i detta format:
     });
   }
 }
+``
