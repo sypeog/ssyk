@@ -6,6 +6,13 @@ export default async function handler(req, res) {
       ? JSON.parse(req.body)
       : req.body;
 
+    // ✅ Hantera om man öppnar API utan data
+    if (!body || !body.title || !body.desc) {
+      return res.status(200).json({
+        message: "API is working. Send POST request with title and desc."
+      });
+    }
+
     const { title, desc } = body;
 
     // ✅ Anropa OpenAI
@@ -48,10 +55,11 @@ Returnera ENDAST JSON i detta format:
       })
     });
 
-    // ✅ Kolla om OpenAI svarade korrekt
+    // ✅ Läs OpenAI svar
     const data = await response.json();
     console.log("OpenAI response:", data);
 
+    // ✅ Om OpenAI returnerar error
     if (!data.choices) {
       return res.status(500).json({
         error: "OpenAI svarade med fel",
@@ -61,7 +69,7 @@ Returnera ENDAST JSON i detta format:
 
     const text = data.choices[0].message.content;
 
-    // ✅ Försök tolka JSON säkert
+    // ✅ Försök parse JSON säkert
     let parsed;
 
     try {
@@ -92,4 +100,3 @@ Returnera ENDAST JSON i detta format:
     });
   }
 }
-``
