@@ -1,8 +1,14 @@
 
 export default async function handler(req, res) {
   try {
-    const { title, desc } = req.body;
+    // ✅ Hantera body korrekt
+    const body = typeof req.body === "string"
+      ? JSON.parse(req.body)
+      : req.body;
 
+    const { title, desc } = body;
+
+    // ✅ Anropa OpenAI
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -25,7 +31,7 @@ Matcha denna roll till SSYK.
 Titel: ${title}
 Beskrivning: ${desc}
 
-Returnera ENDAST JSON:
+Returnera ENDAST JSON i detta format:
 {
   "results": [
     {
@@ -42,21 +48,32 @@ Returnera ENDAST JSON:
       })
     });
 
+    // ✅ Kolla om OpenAI svarade korrekt
     const data = await response.json();
+    console.log("OpenAI response:", data);
+
+    if (!data.choices) {
+      return res.status(500).json({
+        error: "OpenAI svarade med fel",
+        details: data
+      });
+    }
+
     const text = data.choices[0].message.content;
 
+    // ✅ Försök tolka JSON säkert
     let parsed;
 
     try {
       parsed = JSON.parse(text);
     } catch (e) {
-      console.log("Fel JSON från AI:", text);
+      console.error("JSON parse error:", text);
 
       parsed = {
         results: [
           {
             ssyk: "0000",
-            title: "Kunde inte tolka svar",
+            title: "Kunde inte tolka AI-svar",
             confidence: 0,
             p10: 0
           }
@@ -67,7 +84,12 @@ Returnera ENDAST JSON:
     res.status(200).json(parsed);
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "AI error" });
+    console.error("FULL ERROR:", error);
+
+    res.status(500).json({
+      error: "Server error",
+      message: error.message
+    });
   }
 }
+``
