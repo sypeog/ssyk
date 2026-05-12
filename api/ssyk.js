@@ -1,7 +1,7 @@
 
 export default async function handler(req, res) {
   try {
-    // ✅ Hantera body korrekt
+    // ✅ Hantera body
     const body = typeof req.body === "string"
       ? JSON.parse(req.body)
       : req.body;
@@ -15,15 +15,18 @@ export default async function handler(req, res) {
 
     const { title, desc } = body;
 
-    // ✅ Anropa OpenRouter (GRATIS AI)
+    // ✅ OpenRouter call (GRATIS AI)
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "HTTP-Referer": "https://sypeog.github.io/",
+        "X-Title": "SSYK App"
       },
       body: JSON.stringify({
-        model: "mistralai/mistral-7b-instruct",
+        model: "openai/gpt-3.5-turbo",
+        temperature: 0.2,
         messages: [
           {
             role: "system",
@@ -57,7 +60,7 @@ Returnera ENDAST JSON i detta format:
     const data = await response.json();
     console.log("OpenRouter response:", data);
 
-    // ✅ Hantera error från AI
+    // ✅ Om AI svarar med fel
     if (!data.choices) {
       return res.status(500).json({
         error: "AI svarade med fel",
@@ -67,7 +70,7 @@ Returnera ENDAST JSON i detta format:
 
     const text = data.choices[0].message.content;
 
-    // ✅ Försök parse JSON säkert
+    // ✅ Försök tolka JSON
     let parsed;
 
     try {
